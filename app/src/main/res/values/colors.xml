@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="beige">#5A584A</color>
+    <color name="taup">#72705E</color>
+    <color name="taupe">#5A584A</color>
+    <color name="khaki">#C3B091</color>
+
+    <!-- Light Theme Colors -->
+    <color name="my_light_primary">#72705E</color>
+    <color name="my_light_primary_variant">#000000</color>
+    <color name="my_light_on_primary">#FFFFFF</color>
+    <color name="my_light_secondary">#000000</color>
+    <color name="my_light_secondary_variant">#000000</color>
+    <color name="my_light_on_secondary">#000000</color>
+    <color name="my_light_background">#FFFFFF</color>
+    <color name="my_light_on_background">#000000</color>
+    <color name="my_light_surface">#FFFFFF</color>
+    <color name="my_light_on_surface">#000000</color>
+    <color name="my_status_bar_color">#70705A</color>
+</resources>

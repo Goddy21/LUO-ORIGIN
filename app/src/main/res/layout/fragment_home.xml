@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none"
+    android:layout_marginTop="64dp"
+    tools:context=".Home">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Luo Culture and Tradition"
+            android:textStyle="bold"
+            android:textColor="@color/beige"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textSize="30sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="This book explores the origin of the culture of the Luo-speaking people, who are spread across six countries in Eastern Africa. Culture plays a crucial role in defining people’s identity, their belief systems, and patterns of behavior."
+            android:textSize="20sp"
+            android:textAlignment="viewStart"
+            android:justificationMode="inter_word"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/beige" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="Map indicating the Luo origin"
+            android:src="@drawable/map"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:layout_marginBottom="16dp" />
+    </LinearLayout>
+</ScrollView>

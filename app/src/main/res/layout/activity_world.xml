@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:theme="@style/Base.Theme.TheOriginOfLuoCulture"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".World">
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/drawer_layout"
+        tools:openDrawer="start">
+
+        <!-- Top-Side navigation bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0sp"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:elevation="4dp"
+                app:titleTextColor="@color/white"
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:title="The Origin Of Luo culture" />
+
+            <FrameLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/bottomNav"/>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/nav_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@color/taupe"
+            app:itemTextColor="@color/white"
+            android:layout_marginTop="0dp"
+            app:menu="@menu/navigation_menu"
+            android:paddingTop="100dp" />
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+
+
+    <!-- Bottom Navigation bar -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/taupe"
+        app:itemTextColor="@color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        app:menu="@menu/nav_menu"/>
+</RelativeLayout>
+
