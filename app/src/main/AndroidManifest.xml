@@ -13,6 +13,12 @@
         android:theme="@style/Theme.TheOriginOfLuoCulture"
         tools:targetApi="31">
         <activity
+            android:name=".ErrorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PageViewerActivity"
+            android:exported="false" />
+        <activity
             android:name=".World"
             android:exported="false"
             android:label="@string/title_activity_world" />

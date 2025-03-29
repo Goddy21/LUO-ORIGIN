@@ -1,115 +1,134 @@
 package semeluo.history.book.theoriginofluoculture
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.ListView
+import android.widget.ExpandableListView
 import android.widget.SearchView
+import androidx.fragment.app.Fragment
+import org.json.JSONArray
+import java.io.IOException
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [Chapters.newInstance] factory method to
- * create an instance of this fragment.
- */
 class Chapters : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var expandableListView: ExpandableListView
+    private lateinit var searchEditText: SearchView
+    private lateinit var adapter: ChapterExpandableListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_chapters, container, false)
-        val search = view.findViewById<SearchView>(R.id.searchView) as SearchView
 
-        search.post {
-            val searchText = search.findViewById<android.widget.EditText>(androidx.appcompat.R.id.search_src_text)
-            searchText?.let {
-                it.setTextColor(resources.getColor(android.R.color.black))
-                it.setHintTextColor(resources.getColor(android.R.color.darker_gray))
-                it.textSize = 16f
-            }
+        dbHelper = DatabaseHelper(requireContext())
+
+        // Check if the database is empty and add chapters if true
+        if (dbHelper.isDatabaseEmpty()) {
+            addChaptersToDatabase(requireContext())
         }
 
+        expandableListView = view.findViewById<ExpandableListView>(R.id.listView)
+        searchEditText = view.findViewById(R.id.search) // Initialize the SearchView
 
-        val searchIcon = search.findViewById<View>(androidx.appcompat.R.id.search_mag_icon)
-        (searchIcon as? ImageView)?.setColorFilter(resources.getColor(R.color.my_light_on_secondary))
+        loadChapters()
 
-        val closeIcon = search.findViewById<View>(androidx.appcompat.R.id.search_close_btn)
-        (closeIcon as? ImageView)?.setColorFilter(resources.getColor(R.color.my_light_on_secondary))
 
-        val list = view.findViewById<ListView>(R.id.listView) as ListView
-        val chapters = arrayOf("Prologue","Introduction", "In the garden of Eden",
-            "Complete account of all nations from Noah",
-            "Japhethites(Europeans and the Persians)",
-            "Shemites(Arabs, Persians, Hebrews, Israelites)",
-            "Hamites(Africans and some Arabs)",
-            "Summary of the Biblical account of Nations",
-            "The origin of some common names",
-            "The Nubians",
-            "The Nubian Dynasty in Egypt",
-            "Dynasties 1 to 6-Early dynasty period (C.3100-2686 BCE)",
-            "Nubians after the 25th dynasty",
-            "The rise and fall of the Kush kingdom",
-            "The Meroetic alphabet and language",
-            "Social and administrative structure in the kingdom of Kush",
-            "The downfall of the Kush kingdom",
-            "The last three Nubian kingdoms",
-            "Kingdom of Nobatia (350-590 AD",
-            "Kingdom of Makuria (590-1314 AD",
-            "Kingdom of Alodia (Nubia), 570-1480 AD")
-        val chapterAdap: ArrayAdapter<String> = ArrayAdapter(requireContext(),R.layout.list_item,R.id.textViewItem, chapters)
-        list.adapter = chapterAdap
-
-        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+        // Add a text change listener for search functionality
+        searchEditText.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                chapterAdap.filter.filter(newText)
-                return false
+                adapter.filter(newText ?: "") // Filter the adapter based on input
+                return true
             }
         })
+
         return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Menu.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            Chapters().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    private fun addChaptersToDatabase(context: Context) {
+        val jsonString = loadJSONFromAsset(context, "book_content.json")
+        val jsonArray = JSONArray(jsonString)
+
+        for (i in 0 until jsonArray.length()) {
+            val chapterObj = jsonArray.getJSONObject(i)
+            val chapterName = chapterObj.getString("chapter")
+            val chapterId = dbHelper.insertChapter(chapterName) // Insert chapter into the database
+
+            // Get pages array
+            val pagesArray = chapterObj.getJSONArray("pages")
+            for (j in 0 until pagesArray.length()) {
+                val pageObj = pagesArray.getJSONObject(j)
+                dbHelper.insertPage(
+                    pageObj.getString("title"),
+                    pageObj.getString("content"),
+                    chapterId.toInt(), // Use the inserted chapter ID
+                    pageObj.getInt("page_number")
+                )
             }
+        }
+    }
+
+    private fun loadChapters() {
+        val chapters = dbHelper.getChapters() // This should yield List<Pair<Int, String>>
+        val chapterMap = mutableMapOf<String, List<Triple<Int, String, Int>>>()
+
+        for ((id, name) in chapters) {
+            val pages = dbHelper.getPagesByChapter(id) // Fetch pages based on chapter ID
+            val pageList = pages.map { page ->
+                Triple(page.id, page.title, page.pageNumber) // Convert to Triple for easier access
+            }
+            chapterMap[name] = pageList // Map chapter name to its pages
+        }
+
+        val chapterTitles: List<String> = chapterMap.keys.toList() // Get Chapter titles as a List of Strings
+        adapter = ChapterExpandableListAdapter(requireContext(), chapterTitles, chapterMap)
+
+        expandableListView.setAdapter(adapter)
+
+        // Handle child clicks to view specific page content
+        expandableListView.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
+            val chapterName = chapterTitles[groupPosition]
+            val pages = chapterMap[chapterName] ?: return@setOnChildClickListener false
+
+            if (pages.size > childPosition) {
+                val (pageId, pageTitle, pageNumber) = pages[childPosition]
+
+                val intent = Intent(requireContext(), PageViewerActivity::class.java).apply {
+                    putExtra("PAGE_ID", pageId)
+                    putExtra("PAGE_TITLE", pageTitle)
+                    putExtra("CHAPTER_NAME", chapterName)
+                    putExtra("PAGE_NUMBER", pageNumber)
+                }
+                startActivity(intent)
+            } else {
+                Log.e("ChaptersFragment", "Invalid child position: $childPosition for chapter: $chapterName")
+            }
+
+            true
+        }
+    }
+
+    private fun loadJSONFromAsset(context: Context, fileName: String): String {
+        return try {
+            val inputStream = context.assets.open(fileName)
+            val size = inputStream.available()
+            val buffer = ByteArray(size)
+            inputStream.read(buffer)
+            inputStream.close()
+            String(buffer, Charsets.UTF_8)
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+            throw RuntimeException("Failed to load JSON from asset: $fileName")
+        }
     }
 }
