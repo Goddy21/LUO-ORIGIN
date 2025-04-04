@@ -9,11 +9,11 @@
     <item
         android:id="@+id/navigation_chapters"
         android:icon="@drawable/chaptersicon"
-        android:title="Chapters" />
+        android:title="@string/chapters" />
 
     <item
         android:id="@+id/navigation_profile"
         android:icon="@drawable/profileicon"
-        android:title="Profile" />
+        android:title="@string/profile" />
 
 </menu>

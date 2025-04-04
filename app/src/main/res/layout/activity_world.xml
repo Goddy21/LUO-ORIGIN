@@ -64,9 +64,11 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="72dp"
         android:background="@color/taupe"
         app:itemTextColor="@color/white"
+        app:itemBackground="@color/taupe"
+        app:itemIconTint="@color/white"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="0dp"
         app:menu="@menu/nav_menu"/>
